@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var p=new URLSearchParams(location.search);if(p.has("nr")){sessionStorage.setItem("wl","1");return;}if(sessionStorage.getItem("wl"))return;var pl=(navigator.language||"").toLowerCase().slice(0,2)==="pl";var h=location.hostname;if(/weryta\.com$/.test(h)&&pl){location.replace("https://weryta.pl/?nr=1");}else if(/weryta\.pl$/.test(h)&&!pl){location.replace("https://weryta.com/?nr=1");}}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Local, evidence-governed AI that answers with proof — source, version, valid-time — or says Unknown. For regulated technical teams.">
+<link rel="canonical" href="https://weryta.com/">
+<link rel="alternate" hreflang="en" href="https://weryta.com/">
+<link rel="alternate" hreflang="pl" href="https://weryta.pl/">
+<link rel="alternate" hreflang="x-default" href="https://weryta.com/">
+<title>Weryta — Ask for proof, not just an answer</title>
+<style>
+:root{
+  --paper:#eceff3; --card:#ffffff; --ink:#141a20; --muted:#59646f;
+  --line:#dce2e9; --accent:#0e7a6b; --accent-ink:#0b5f54;
+  --entailed:#12855a; --entailed-bg:#e6f4ec;
+  --contradicted:#c23b3b; --contradicted-bg:#f9e9e7;
+  --unknown:#a9760f; --unknown-bg:#f6efe1;
+  --derived:#3d67a8; --derived-bg:#e9eef8;
+  --serif:"Iowan Old Style",Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0d1217; --card:#151c23; --ink:#e7edf3; --muted:#94a2b0;
+  --line:#232d38; --accent:#39b7a2; --accent-ink:#5fcdb9;
+  --entailed:#3ec98a; --entailed-bg:#122a20;
+  --contradicted:#ec7b72; --contradicted-bg:#2b1a17;
+  --unknown:#dba43e; --unknown-bg:#282011;
+  --derived:#7ea6e6; --derived-bg:#141e2c;
+}}
+:root[data-theme="dark"]{
+  --paper:#0d1217; --card:#151c23; --ink:#e7edf3; --muted:#94a2b0;
+  --line:#232d38; --accent:#39b7a2; --accent-ink:#5fcdb9;
+  --entailed:#3ec98a; --entailed-bg:#122a20;
+  --contradicted:#ec7b72; --contradicted-bg:#2b1a17;
+  --unknown:#dba43e; --unknown-bg:#282011;
+  --derived:#7ea6e6; --derived-bg:#141e2c;
+}
+:root[data-theme="light"]{
+  --paper:#eceff3; --card:#ffffff; --ink:#141a20; --muted:#59646f;
+  --line:#dce2e9; --accent:#0e7a6b; --accent-ink:#0b5f54;
+  --entailed:#12855a; --entailed-bg:#e6f4ec;
+  --contradicted:#c23b3b; --contradicted-bg:#f9e9e7;
+  --unknown:#a9760f; --unknown-bg:#f6efe1;
+  --derived:#3d67a8; --derived-bg:#e9eef8;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 24px}
+.rule{max-width:820px;margin:0 auto;border:0;border-top:1px solid var(--line)}
+
+/* hero */
+.hero{padding:80px 24px 56px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--accent-ink);text-transform:uppercase;margin:0 0 18px}
+h1{font-family:var(--serif);font-size:clamp(40px,7vw,62px);font-weight:600;line-height:1.02;letter-spacing:-.015em;margin:0;text-wrap:balance}
+h1 .light{color:var(--muted);font-style:italic;font-weight:500}
+.lede{font-size:19px;color:var(--muted);max-width:60ch;margin:22px 0 0}
+.lede strong{color:var(--ink);font-weight:600}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:34px 0 0}
+.btn{display:inline-block;font-weight:600;font-size:15px;padding:12px 22px;border-radius:9px;text-decoration:none;border:1px solid transparent}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink)}
+.btn.ghost{border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--accent)}
+
+/* section */
+section{padding:52px 24px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin:0 0 8px}
+h2{font-family:var(--serif);font-size:28px;font-weight:600;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.sub{font-size:16px;color:var(--muted);max-width:62ch;margin:0 0 28px}
+
+/* verdict strip */
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0}
+.v{border:1px solid var(--line);border-radius:11px;background:var(--card);padding:16px 16px 18px;border-top:3px solid var(--vc)}
+.v.entailed{--vc:var(--entailed)} .v.contradicted{--vc:var(--contradicted)}
+.v.unknown{--vc:var(--unknown)} .v.derived{--vc:var(--derived)}
+.v .badge{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--vc);margin:0 0 7px}
+.v p{font-size:13.5px;color:var(--muted);margin:0}
+
+/* proof card */
+.proof{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--entailed);border-radius:12px;padding:22px 24px;box-shadow:0 1px 2px rgba(20,30,40,.04),0 10px 30px rgba(20,30,40,.06)}
+.proof.k-contradicted{border-left-color:var(--contradicted)}
+.proof.k-unknown{border-left-color:var(--unknown)}
+.cli{font-family:var(--mono);font-size:12.5px;background:color-mix(in srgb,var(--ink) 5%,transparent);border:1px solid var(--line);border-radius:7px;padding:9px 12px;margin:0 0 15px;overflow-x:auto;white-space:nowrap}
+.cli .p{color:var(--accent);font-weight:700;margin-right:6px}
+.cli .dim{color:var(--muted)}
+.vd{font-family:var(--sans);font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 11px;border-radius:999px;display:inline-block;margin:0 0 9px}
+.vd.e{color:var(--entailed);background:var(--entailed-bg)}
+.vd.c{color:var(--contradicted);background:var(--contradicted-bg)}
+.vd.u{color:var(--unknown);background:var(--unknown-bg)}
+.ans{font-size:16px;margin:0 0 14px}
+.ans.muted{color:var(--muted)}
+.bul{list-style:none;margin:0;padding:0}
+.bul li{border-left:2px solid var(--line);padding:2px 0 2px 13px;margin:0 0 9px}
+.src{font-family:var(--mono);font-size:12px;color:var(--muted);margin:0 0 4px}
+.claim{font-family:var(--mono);font-size:13.5px;font-weight:600}
+.chip{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:5px;margin-left:6px;white-space:nowrap}
+.chip.t{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.chip.s{color:var(--entailed);background:var(--entailed-bg);font-weight:600}
+.ident{font-family:var(--mono);font-size:10.5px;color:var(--muted);opacity:.72;margin-top:4px}
+.reason{font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:11px;margin:14px 0 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+
+/* is / isn't */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+@media(max-width:640px){.cols{grid-template-columns:1fr}}
+.col{padding:22px 24px}
+.col+.col{border-left:1px solid var(--line)}
+@media(max-width:640px){.col+.col{border-left:0;border-top:1px solid var(--line)}}
+.col h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 14px}
+.col.is h3{color:var(--entailed)} .col.isnt h3{color:var(--muted)}
+.col ul{list-style:none;margin:0;padding:0}
+.col li{font-size:14.5px;padding:6px 0 6px 22px;position:relative;color:var(--ink)}
+.col.isnt li{color:var(--muted)}
+.col li::before{position:absolute;left:0;font-family:var(--mono)}
+.col.is li::before{content:"+";color:var(--entailed);font-weight:700}
+.col.isnt li::before{content:"—";color:var(--muted)}
+
+.who{font-size:16px;color:var(--muted);max-width:60ch}
+.who b{color:var(--ink)}
+
+/* cta band */
+.band{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:38px 32px;text-align:center;margin:0 24px}
+.band h2{margin:0 0 8px}
+.band p{color:var(--muted);max-width:52ch;margin:0 auto 22px}
+
+footer{padding:44px 24px 72px;color:var(--muted);font-size:12.5px}
+footer .fnote{max-width:70ch}
+footer code{font-family:var(--mono);font-size:11.5px}
+.langsw{max-width:820px;margin:0 auto;padding:20px 24px 0;font-family:var(--mono);font-size:12.5px;text-align:right}
+.langsw a{color:var(--muted);text-decoration:none}.langsw a.on{color:var(--ink);font-weight:700}.langsw a:hover{color:var(--accent)}
+.wm{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink)}
+.wm .dot{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="langsw"><a class="on" href="./">EN</a> | <a href="https://weryta.pl/?nr=1">PL</a></div>
+<div class="hero wrap">
+  <p class="eyebrow">Private · local · evidence-governed</p>
+  <h1>Ask Weryta for proof.<br><span class="light">Not just an answer.</span></h1>
+  <p class="lede">For teams that can't accept a plausible but uncited answer. Every answer comes with its
+    <strong>source</strong>, its <strong>time bounds</strong>, and its <strong>proof</strong> —
+    or Weryta says it <strong>doesn't know</strong>. Runs on your hardware; your documents stay yours.</p>
+  <div class="cta-row">
+    <a class="btn primary" href="#talk">See if it fits your documents</a>
+    <a class="btn ghost" href="#proof">See a real answer</a>
+  </div>
+</div>
+<hr class="rule">
+
+<section class="wrap" id="proof">
+  <p class="kicker">What an answer looks like</p>
+  <h2>The answer is the evidence.</h2>
+  <p class="sub">A question about a procedure at a point in time. Weryta returns a verdict, the exact
+    document section, the interval it was valid for, its status, and tamper-evident identifiers — or
+    an honest <em>Unknown</em>. (Example uses illustrative data.)</p>
+  <div class="grid2">
+    <div class="proof">
+      <div class="cli"><span class="p">$</span> weryta ask <span class="dim">procedures</span> Procedure-X is approved <span style="color:var(--accent)">--at week-30</span></div>
+      <span class="vd e">Entailed</span>
+      <p class="ans">Procedure-X was approved.</p>
+      <ul class="bul"><li>
+        <div class="src">Quality-Register §4.2 — "Procedure X approved, rev A"</div>
+        <div><code class="claim">Procedure-X is approved</code><span class="chip t">[wk 5, wk 42)</span><span class="chip s">Verified</span></div>
+        <div class="ident">Fact ID 104 · Evidence ID sha256:…</div>
+      </li></ul>
+      <p class="reason">Direct evidence · proof bundle sha256:…</p>
+    </div>
+    <div class="proof k-contradicted">
+      <div class="cli"><span class="p">$</span> weryta ask <span class="dim">procedures</span> Procedure-X is approved <span style="color:var(--accent)">--at week-45</span></div>
+      <span class="vd c">Contradicted</span>
+      <p class="ans">No — the record shows the opposite at week 45.</p>
+      <ul class="bul"><li>
+        <div class="src">Quality-Register §4.2 — "Procedure X withdrawn, superseded"</div>
+        <div><code class="claim">Procedure-X is-not approved</code><span class="chip t">[wk 42, ∞)</span><span class="chip s">Verified</span></div>
+        <div class="ident">Fact ID 105 · Evidence ID sha256:…</div>
+      </li></ul>
+      <p class="reason">Evidence of falsehood — not absence of evidence.</p>
+    </div>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">Four answers, never a bluff</p>
+  <h2>It knows the difference between wrong, and don't-know.</h2>
+  <div class="verdicts">
+    <div class="v entailed"><div class="badge">Entailed</div><p>The record directly supports it — with the source and the dates it held.</p></div>
+    <div class="v contradicted"><div class="badge">Contradicted</div><p>The record directly says the opposite — a withdrawal, a supersession.</p></div>
+    <div class="v unknown"><div class="badge">Unknown</div><p>No basis in the documents you gave it. It refuses to invent one.</p></div>
+    <div class="v derived"><div class="badge">Derived</div><p>An inference — shown with its rule and every parent fact, never as a stored fact.</p></div>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">Read both columns</p>
+  <h2>Honest about what it is.</h2>
+  <div class="cols">
+    <div class="col is">
+      <h3>What it does</h3>
+      <ul>
+        <li>Answers from verified, source-backed facts</li>
+        <li>Knows <em>when</em> a fact was true (validity intervals, supersession)</li>
+        <li>Exports a proof pack you can verify offline and hand to an auditor</li>
+        <li>Says <em>Unknown</em> instead of guessing</li>
+        <li>Runs locally — data never leaves your machine</li>
+      </ul>
+    </div>
+    <div class="col isnt">
+      <h3>What it is not</h3>
+      <ul>
+        <li>Not a chatbot and not "an AGI"</li>
+        <li>Not automatic PDF understanding — facts are reviewed by a person</li>
+        <li>Not a source of autonomous decisions</li>
+        <li>Not legal or compliance advice</li>
+        <li>Hashes prove the export wasn't edited — not who issued the document</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">Who it's for</p>
+  <h2>When a plausible answer isn't good enough.</h2>
+  <p class="who">Teams that live in <b>technical procedures and version changes</b>, <b>administrative
+    decisions, registers and deadlines</b>, <b>quality documentation</b>, <b>incident reports</b>,
+    <b>maintenance procedures</b>, or <b>internal audits</b> — where the real question is not "what's
+    the answer" but "show me the document, the section, and the version that was in force that day."</p>
+</section>
+
+<div class="band" id="talk">
+  <h2>Does this happen on your team?</h2>
+  <p>When did someone last answer a question about a procedure, decision, or condition — but couldn't
+    show the document, the section, and the version in force on that day?</p>
+  <a class="btn primary" href="mailto:contact@weryta.com?subject=Weryta%20—%20a%20conversation">Start a 25-minute conversation</a>
+</div>
+
+<footer class="wrap">
+  <p class="fnote"><span class="wm">Weryta<span class="dot">.</span></span> &nbsp; Local, evidence-governed decision support. Learning may improve
+  <em>how it searches</em>; only reviewed evidence changes <em>what it believes</em>. Proof packs are
+  tamper-evident (any edit changes the hash), not a source-authenticity signature. Not legal advice.
+  Illustrative examples use non-identifying data.</p>
+</footer>
+</body>
+</html>
