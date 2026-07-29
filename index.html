@@ -18,6 +18,7 @@
   --contradicted:#c23b3b; --contradicted-bg:#f9e9e7;
   --unknown:#a9760f; --unknown-bg:#f6efe1;
   --derived:#3d67a8; --derived-bg:#e9eef8;
+  --ambiguous:#8a5cc4; --associated:#6b7787;
   --serif:"Iowan Old Style",Georgia,"Times New Roman",serif;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
   --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,monospace;
@@ -29,6 +30,7 @@
   --contradicted:#ec7b72; --contradicted-bg:#2b1a17;
   --unknown:#dba43e; --unknown-bg:#282011;
   --derived:#7ea6e6; --derived-bg:#141e2c;
+  --ambiguous:#b490e8; --associated:#8e9aa8;
 }}
 :root[data-theme="dark"]{
   --paper:#0d1217; --card:#151c23; --ink:#e7edf3; --muted:#94a2b0;
@@ -37,6 +39,7 @@
   --contradicted:#ec7b72; --contradicted-bg:#2b1a17;
   --unknown:#dba43e; --unknown-bg:#282011;
   --derived:#7ea6e6; --derived-bg:#141e2c;
+  --ambiguous:#b490e8; --associated:#8e9aa8;
 }
 :root[data-theme="light"]{
   --paper:#eceff3; --card:#ffffff; --ink:#141a20; --muted:#59646f;
@@ -45,6 +48,7 @@
   --contradicted:#c23b3b; --contradicted-bg:#f9e9e7;
   --unknown:#a9760f; --unknown-bg:#f6efe1;
   --derived:#3d67a8; --derived-bg:#e9eef8;
+  --ambiguous:#8a5cc4; --associated:#6b7787;
 }
 *{box-sizing:border-box}
 body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
@@ -72,10 +76,19 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;margin:0 0 10px;lette
 .sub{font-size:16px;color:var(--muted);max-width:62ch;margin:0 0 28px}
 
 /* verdict strip */
-.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0}
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:0}
 .v{border:1px solid var(--line);border-radius:11px;background:var(--card);padding:16px 16px 18px;border-top:3px solid var(--vc)}
 .v.entailed{--vc:var(--entailed)} .v.contradicted{--vc:var(--contradicted)}
 .v.unknown{--vc:var(--unknown)} .v.derived{--vc:var(--derived)}
+.v.ambiguous{--vc:var(--ambiguous)} .v.associated{--vc:var(--associated)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:22px 0 0}
+.metric{border:1px solid var(--line);border-radius:11px;background:var(--card);padding:16px 18px}
+.metric .n{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1;color:var(--ink)}
+.metric .l{font-size:13px;color:var(--muted);margin:7px 0 0}
+.note{font-size:13px;color:var(--muted);max-width:72ch;margin:16px 0 0}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;
+     text-transform:uppercase;padding:2px 7px;border-radius:5px;border:1px solid var(--line);
+     color:var(--muted);margin-left:8px;vertical-align:middle}
 .v .badge{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--vc);margin:0 0 7px}
 .v p{font-size:13.5px;color:var(--muted);margin:0}
 
@@ -96,12 +109,15 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;margin:0 0 10px;lette
 .bul li{border-left:2px solid var(--line);padding:2px 0 2px 13px;margin:0 0 9px}
 .src{font-family:var(--mono);font-size:12px;color:var(--muted);margin:0 0 4px}
 .claim{font-family:var(--mono);font-size:13.5px;font-weight:600}
-.chip{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:5px;margin-left:6px;white-space:nowrap}
+.bul li>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.chip{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:5px;white-space:nowrap}
+.claim{overflow-wrap:anywhere}
 .chip.t{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .chip.s{color:var(--entailed);background:var(--entailed-bg);font-weight:600}
 .ident{font-family:var(--mono);font-size:10.5px;color:var(--muted);opacity:.72;margin-top:4px}
 .reason{font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:11px;margin:14px 0 0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid2>*{min-width:0}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 
 /* is / isn't */
@@ -188,14 +204,89 @@ footer code{font-family:var(--mono);font-size:11.5px}
 <hr class="rule">
 
 <section class="wrap">
-  <p class="kicker">Four answers, never a bluff</p>
+  <p class="kicker">Five verdicts, never a bluff</p>
   <h2>It knows the difference between wrong, and don't-know.</h2>
+  <p class="sub">Most systems have two states: an answer, or nothing. Weryta has five — because
+    "the evidence conflicts" is not "there is no evidence", and an association is not yet a claim.</p>
   <div class="verdicts">
     <div class="v entailed"><div class="badge">Entailed</div><p>The record directly supports it — with the source and the dates it held.</p></div>
     <div class="v contradicted"><div class="badge">Contradicted</div><p>The record directly says the opposite — a withdrawal, a supersession.</p></div>
+    <div class="v ambiguous"><div class="badge">Ambiguous</div><p>The corpus holds the claim <em>and</em> its negation at equal specificity. Not missing knowledge — a conflict in the documents that a human has to settle.</p></div>
+    <div class="v associated"><div class="badge">Associated</div><p>Nothing is claimed. The associative layer links the concepts and points at where to look — a retrieval suggestion, never an answer.</p></div>
     <div class="v unknown"><div class="badge">Unknown</div><p>No basis in the documents you gave it. It refuses to invent one.</p></div>
-    <div class="v derived"><div class="badge">Derived</div><p>An inference — shown with its rule and every parent fact, never as a stored fact.</p></div>
   </div>
+  <p class="note"><b>"Derived" is not a verdict</b> — it is a kind of answer inside a proof pack:
+    an inference from parent facts, shown with its full chain and rule, never as a stored fact.</p>
+</section>
+<hr class="rule">
+
+<section class="wrap" id="exam">
+  <p class="kicker">Why believe us</p>
+  <h2>Not a claim. A number.</h2>
+  <p class="sub">An external benchmark — bAbI (Facebook AI) — on questions the system has never
+    seen, with no training at all. Weryta is not a language model: it has no pretrained knowledge,
+    so any sentence outside its grammar is refused rather than guessed.</p>
+  <div class="metrics">
+    <div class="metric"><div class="n">3,000</div><p class="l">test questions (3 tasks × 1,000)</p></div>
+    <div class="metric"><div class="n">100%</div><p class="l">correct on every one of the tasks</p></div>
+    <div class="metric"><div class="n">0</div><p class="l">claims asserted without evidence</p></div>
+  </div>
+  <p class="note">Tasks: single supporting fact, time reasoning, deduction by inheritance.
+    For scale, an untrained LSTM scores roughly 50/27/21% here. Separately, on an internal range of
+    worlds generated from hidden semantics that candidate rules never see, one gate is absolute:
+    <b>zero false assertions</b> — a rule that states an untruth even once does not pass, no matter
+    how much it gains elsewhere.</p>
+  <p class="note">Weryta would rather say <em>Unknown</em> than guess — and we have a number for
+    that, not a slogan.</p>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">Decision ledger</p>
+  <h2>A history that cannot be quietly rewritten.</h2>
+  <p class="sub">Every decision to accept or reject a fact is appended to a ledger in which
+    <b>each row seals the previous one with a cryptographic hash</b>. Cut a single row, or change
+    a single character, and the chain no longer adds up — visibly, immediately. A mistake is never
+    fixed by overwriting: it is a new row.</p>
+  <p class="sub">The head of that chain is anchored into Bitcoin via OpenTimestamps. We store no
+    data there — only the hash is anchored. <b>Thirty-two bytes leave the building.
+    Your documents never do.</b></p>
+  <p class="note">Rewriting our history would mean forging a Bitcoin block. Verification runs
+    offline, against your own node — you do not have to trust us to check it.</p>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">A second witness</p>
+  <h2>Two models agreeing is not proof.</h2>
+  <p class="sub">A fact about when a rule came into force is accepted automatically only when an
+    independent <b>state registry</b> confirms it (the Polish parliament's ELI interface). A model
+    can be confidently wrong; a registry is a witness that does not guess.</p>
+  <p class="note">From our own ledger: the model gave an effective date of <code>2020-01-02</code>,
+    the registry answered <code>2020-01-06</code>. The fact never entered the store.
+    Two models agreeing is not proof. Agreeing with the state registry is.</p>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">Two axes of time</p>
+  <h2>What held then — and what was known then.</h2>
+  <p class="sub">Weryta separates <b>valid time</b> (when a rule was actually in force) from
+    <b>knowledge time</b> (when we learned of it). That is what lets it answer the question audits
+    actually ask: "what was true on 1 March 2021, as far as anyone knew on 1 June 2021" — rather
+    than only "what is true today".</p>
+  <p class="note">Two axes of time are decades-old computer science (bitemporality, SQL:2011) and we
+    did not invent them. What Weryta adds is a proof pack you can verify offline, without trusting us.</p>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">What you need to run it</p>
+  <h2>An ordinary laptop. No GPU. No cloud.</h2>
+  <p class="sub">Weryta is a small Rust binary that runs offline on hardware you already own.
+    Checking a proof pack needs no graphics card and no network either.</p>
+  <p class="note">Heavier hardware is required only if you want to run local language models in the
+    learning pipeline — Weryta itself, and proof verification, do not.</p>
 </section>
 <hr class="rule">
 
@@ -228,12 +319,77 @@ footer code{font-family:var(--mono);font-size:11.5px}
 <hr class="rule">
 
 <section class="wrap">
+  <p class="kicker">How it learns</p>
+  <h2>Asking often does not make an answer truer.</h2>
+  <p class="sub">The system learns by <b>growing the set of verified facts</b> — not by tuning
+    weights on the path to an answer. The associative layer helps <em>find</em> the right documents;
+    what gets asserted is decided by evidence alone.</p>
+  <p class="note">The channel through which frequent use could have quietly flipped a verdict was
+    measured, judged dangerous, and closed <b>at the compiler level</b> — by types, not by policy:
+    the field is private and read-only, so code that could rewrite truth through usage simply does
+    not compile.</p>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">What we are working on</p>
+  <h2>How far the proof reaches.</h2>
+  <div class="cols">
+    <div class="col is">
+      <h3>Publisher signature <span class="tag">in progress</span></h3>
+      <ul>
+        <li>Poland's Journal of Laws is published as PDFs carrying a qualified signature and timestamp</li>
+        <li>We verified with tooling that the signature checks out on a real act</li>
+        <li>The aim: a fact's provenance reaching the <b>publisher's</b> signature, not our hash</li>
+        <li>A hash proves the export wasn't edited; a publisher's signature proves who issued it</li>
+      </ul>
+    </div>
+    <div class="col is">
+      <h3>Unknown with a next step <span class="tag">direction</span></h3>
+      <ul>
+        <li>The principle: every "Unknown" should carry its own route to resolution</li>
+        <li>Which document, test or measurement would turn it into an answer</li>
+        <li>Gap ranking already works; naming the step at every Unknown is in progress</li>
+        <li>An Unknown is not a dead end — it is a task</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="wrap">
   <p class="kicker">Who it's for</p>
   <h2>When a plausible answer isn't good enough.</h2>
   <p class="who">Teams that live in <b>technical procedures and version changes</b>, <b>administrative
     decisions, registers and deadlines</b>, <b>quality documentation</b>, <b>incident reports</b>,
     <b>maintenance procedures</b>, or <b>internal audits</b> — where the real question is not "what's
     the answer" but "show me the document, the section, and the version that was in force that day."</p>
+</section>
+<hr class="rule">
+
+<section class="wrap">
+  <p class="kicker">Collaboration</p>
+  <h2>Built with the people who use it.</h2>
+  <div class="cols">
+    <div class="col is">
+      <h3>Mikrobiotech</h3>
+      <ul>
+        <li>Practice: administrative decisions, the waste catalogue, deadlines and versions</li>
+        <li>Real cases as the proving ground — this is where the demand for proof comes from</li>
+        <li>Answers verified by the people who have to defend them before a regulator</li>
+      </ul>
+    </div>
+    <div class="col is">
+      <h3>Physix / GirlTech</h3>
+      <ul>
+        <li>The "Fairy Dice" rating scheme — truth and liking as separate axes</li>
+        <li>The seventh state: no rating means "I don't know", not "wrong"</li>
+        <li>Demo: <a href="https://physix.weryta.com/">physix.weryta.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="who" style="margin-top:16px">The collaboration is about method and verification — it does not
+    change the rule that <b>only verified evidence</b> changes what the system believes.</p>
 </section>
 
 <div class="band" id="talk">
