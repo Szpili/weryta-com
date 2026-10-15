@@ -169,9 +169,10 @@ footer code{font-family:var(--mono);font-size:11.5px}
     <a class="btn ghost" href="#proof">See a real answer</a>
   </div>
   <div class="ask" id="zapytaj">
-    <div class="ask-head"><span class="kicker">Beta · Polish statutes</span><span class="ask-note">Statute search with a verbatim citation, unit address and source hash. Ask in Polish. Not legal advice. Do not enter personal data.</span></div>
+    <div class="ask-head"><span class="kicker">Free beta · Polish statutory law</span><span class="ask-note">Statute search with a verbatim citation, unit address and source hash. Ask in Polish. Not legal advice. Do not enter personal data.</span></div>
     <form class="ask-form" id="askf"><input id="askq" type="text" maxlength="500" placeholder="e.g. jaka kara grozi za kradzież?" autocomplete="off" required><button class="btn primary" type="submit">Ask</button></form>
     <div id="askout" class="ask-out" hidden></div>
+    <details id="zakres" class="ask-note" style="margin-top:10px"><summary>Scope: acts with full provision text</summary><div>Loading…</div></details>
   </div>
 </div>
 <style>
@@ -189,13 +190,15 @@ footer code{font-family:var(--mono);font-size:11.5px}
 const API='https://pop-os.tailaf1556.ts.net/prawo';
 const f=document.getElementById('askf'),q=document.getElementById('askq'),out=document.getElementById('askout');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const zk=document.getElementById('zakres');zk.addEventListener('toggle',async()=>{if(!zk.open||zk.dataset.ok)return;try{const z=await (await fetch(API+'/api/zakres')).json();zk.dataset.ok=1;
+ zk.lastElementChild.innerHTML='<p>'+z.aktow+' acts with verbatim citations (wording status from ISAP: '+esc(z.stan_z)+'). Other acts of the 54,819 in force: act pointer only, no citation.</p><ul>'+z.akty.map(a=>'<li>'+esc(a.tytul)+' <span class="m">('+esc(a.eli)+')</span></li>').join('')+'</ul>';}catch(_){}});
 f.addEventListener('submit',async e=>{e.preventDefault();const t=q.value.trim();if(!t)return;out.hidden=false;out.innerHTML='<p class="m">Searching 54,819 acts in force…</p>';
  let n=1;try{n=(+sessionStorage.getItem('wn')||0)+1;sessionStorage.setItem('wn',n);}catch(_){}
  try{const r=await fetch(API+'/api/ask?q='+encodeURIComponent(t)+'&n='+n);const d=await r.json();
   if(!r.ok){out.innerHTML='<p class="m">'+esc(d.co||d.error||'Error')+'</p>';return;}
   let h='<p class="m">'+esc(d.komunikat)+' ('+d.ms+' ms)</p>';
-  (d.cytaty||[]).slice(0,3).forEach((c,i)=>{const kl=c.brzmienie==='pewne'?'ok':'warn';
-   h+='<div class="r"><b>'+esc(c.tytul||c.akt)+'</b> · '+esc(c.adres||String(c.eid).replace(/__/g,' ').replace(/_/g,'. '))+'<div class="m">'+esc(c.eli)+' · unit '+esc(c.cytat_eid)+' · sha256 '+esc((c.sha256_zrodla||'').slice(0,16))+'…</div><blockquote>„'+esc(c.cytat.slice(0,700))+(c.cytat.length>700?'…':'')+'”</blockquote><div class="m">wording: <span class="'+kl+'">'+esc(c.brzmienie)+'</span></div>'+(c.przypis?'<div class="tri"><button class="cp" data-i="'+i+'">Copy citation for a brief</button></div>':'')
+  (d.cytaty||[]).slice(0,3).forEach((c,i)=>{const kl=/bez zmian/.test(c.stan||'')&&!/UWAGA/.test(c.stan||'')?'ok':'warn';
+   h+='<div class="r"><b>'+esc(c.tytul||c.akt)+'</b> · '+esc(c.adres||String(c.eid).replace(/__/g,' ').replace(/_/g,'. '))+'<div class="m">'+esc(c.eli)+' · unit '+esc(c.cytat_eid)+' · sha256 '+esc((c.sha256_zrodla||'').slice(0,16))+'…</div><blockquote>„'+esc(c.cytat.slice(0,700))+(c.cytat.length>700?'…':'')+'”</blockquote><div class="m">legal status: <span class="'+kl+'">'+esc(c.stan||c.brzmienie)+'</span></div>'+(c.przypis?'<div class="tri"><button class="cp" data-i="'+i+'">Copy citation for a brief</button></div>':'')
    +(i===0?'<div class="tri" data-id="'+esc(d.id)+'">Does this provision answer the question? <button data-o="T">Yes</button><button data-o="N">No</button><button data-o="?">Not sure</button></div>':'')+'</div>';});
   (d.akty||[]).slice(0,3).forEach(a=>{h+='<div class="r"><b>'+esc(a.tytul)+'</b><div class="m">'+esc(a.eli)+' · '+esc(a.status)+' · wording: '+esc(a.brzmienie)+' · <a href="'+esc(a.link)+'" rel="noopener" target="_blank">text at ELI</a></div></div>';});
   out.innerHTML=h;
