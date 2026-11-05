@@ -193,17 +193,19 @@ const f=document.getElementById('askf'),q=document.getElementById('askq'),out=do
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const zk=document.getElementById('zakres');zk.addEventListener('toggle',async()=>{if(!zk.open||zk.dataset.ok)return;try{const z=await (await fetch(API+'/api/zakres')).json();zk.dataset.ok=1;
  zk.lastElementChild.innerHTML='<p>'+z.aktow+' acts with verbatim citations (wording status from ISAP: '+esc(z.stan_z)+'). Other acts of the 54,819 in force: act pointer only, no citation.</p><ul>'+z.akty.map(a=>'<li>'+esc(a.tytul)+' <span class="m">('+esc(a.eli)+')</span></li>').join('')+'</ul>';}catch(_){}});
-f.addEventListener('submit',async e=>{e.preventDefault();const t=q.value.trim();if(!t)return;out.hidden=false;out.innerHTML='<p class="m">Searching 54,819 acts in force…</p>';
+let seq=0;
+f.addEventListener('submit',async e=>{e.preventDefault();const t=q.value.trim();if(!t)return;const my=++seq;out.hidden=false;out.innerHTML='<p class="m">Searching 54,819 acts in force…</p>';
  let n=1;try{n=(+sessionStorage.getItem('wn')||0)+1;sessionStorage.setItem('wn',n);}catch(_){}
- try{const r=await fetch(API+'/api/ask?q='+encodeURIComponent(t)+'&n='+n+'&lang=en');const d=await r.json();
-  if(!r.ok){out.innerHTML='<p class="m">'+esc(d.co||d.error||'Error')+'</p>';return;}
+ try{const r=await fetch(API+'/api/ask?q='+encodeURIComponent(t)+'&n='+n+'&lang=en',{signal:AbortSignal.timeout(20000)});let d={};try{d=await r.json();}catch(_){}
+  if(my!==seq)return;
+  if(!r.ok){const msg=r.status===429?'Too many questions from your network — please try again in a few minutes.':(r.status>=502&&r.status<=504)?'The service is being updated (usually 2–4 min). Please try again shortly.':(d.co||d.error||'Error');out.innerHTML='<p class="m">'+esc(msg)+'</p>';return;}
   let h='<p class="m">'+esc(d.komunikat)+' ('+d.ms+' ms)</p>';
   if(d.pytanie_pl)h+='<p class="m">Searched as: '+esc(d.pytanie_pl)+'</p>';
-  (d.cytaty||[]).slice(0,3).forEach((c,i)=>{const kl=/bez zmian/.test(c.stan||'')&&!/UWAGA/.test(c.stan||'')?'ok':'warn';
-   h+='<div class="r"><b>'+esc(c.tytul||c.akt)+'</b> · '+esc(c.adres||String(c.eid).replace(/__/g,' ').replace(/_/g,'. '))+'<div class="m">'+esc(c.eli)+' · unit '+esc(c.cytat_eid)+' · sha256 '+esc((c.sha256_zrodla||'').slice(0,16))+'…</div><blockquote>„'+esc(c.cytat.slice(0,700))+(c.cytat.length>700?'…':'')+'”</blockquote><div class="m">legal status: <span class="'+kl+'">'+esc(c.stan||c.brzmienie)+'</span></div>'+(c.ogloszony||c.obowiazuje_od?'<div class="m">act published '+esc(c.ogloszony||'?')+' · in force since '+esc(c.obowiazuje_od||'?')+'</div>':'')+(c.przypis?'<div class="tri"><button class="cp" data-i="'+i+'">Copy citation (Polish format)</button></div>':'')
+  (d.cytaty||[]).filter(Boolean).slice(0,3).forEach((c,i)=>{const kl=/bez zmian/.test(c.stan||'')&&!/UWAGA/.test(c.stan||'')?'ok':'warn';
+   h+='<div class="r"><b>'+esc(c.tytul||c.akt)+'</b> · '+esc(c.adres||String(c.eid).replace(/__/g,' ').replace(/_/g,'. '))+'<div class="m">'+esc(c.eli)+' · unit '+esc(c.cytat_eid)+' · sha256 '+esc((c.sha256_zrodla||'').slice(0,16))+'…</div><blockquote>„'+esc(String(c.cytat||'').slice(0,700))+(String(c.cytat||'').length>700?'…':'')+'”</blockquote><div class="m">legal status: <span class="'+kl+'">'+esc(c.stan||c.brzmienie)+'</span></div>'+(c.ogloszony||c.obowiazuje_od?'<div class="m">act published '+esc(c.ogloszony||'?')+' · in force since '+esc(c.obowiazuje_od||'?')+'</div>':'')+(c.przypis?'<div class="tri"><button class="cp" data-i="'+i+'">Copy citation (Polish format)</button></div>':'')
    +'<div class="tri"><button class="mt">Show machine translation (not evidence)</button></div>' /* MT: to remove, cut this line + the MT line below + ':not(.mt)' */
    +(i===0?'<div class="tri" data-id="'+esc(d.id)+'">Does this provision answer the question? <button data-o="T">Yes</button><button data-o="N">No</button><button data-o="?">Not sure</button></div>':'')+'</div>';});
-  (d.akty||[]).slice(0,3).forEach(a=>{h+='<div class="r"><b>'+esc(a.tytul)+'</b><div class="m">'+esc(a.eli)+' · '+esc(a.status)+' · wording: '+esc(a.brzmienie)+' · <a href="'+esc(a.link)+'" rel="noopener" target="_blank">text at ELI</a></div></div>';});
+  (d.akty||[]).filter(Boolean).slice(0,3).forEach(a=>{h+='<div class="r"><b>'+esc(a.tytul)+'</b><div class="m">'+esc(a.eli)+' · '+esc(a.status)+' · wording: '+esc(a.brzmienie)+' · <a href="'+esc(a.link)+'" rel="noopener" target="_blank">text at ELI</a></div></div>';});
   out.innerHTML=h;
   out.querySelectorAll('.cp').forEach(b=>b.addEventListener('click',async()=>{const p=d.cytaty[+b.dataset.i].przypis;
    try{await navigator.clipboard.writeText(p);b.textContent='Copied ✓';}catch(_){b.outerHTML='<span class="m">Select and copy:</span><textarea rows="5" style="width:100%">'+esc(p)+'</textarea>';}
@@ -211,7 +213,7 @@ f.addEventListener('submit',async e=>{e.preventDefault();const t=q.value.trim();
   out.querySelectorAll('.mt').forEach(b=>b.addEventListener('click',()=>{b.parentElement.innerHTML='<span class="m">Machine translation is not available yet in this beta; the Polish quote above is the evidence.</span>';})); /* MT: later fetch(API+'/api/przeklad?id='+d.id+'&n=0') */
   out.querySelectorAll('.tri button:not(.cp):not(.mt)').forEach(b=>b.addEventListener('click',async ev=>{const tri=ev.target.closest('.tri');const body=new URLSearchParams({id:tri.dataset.id,ocena:ev.target.dataset.o});
    try{const rr=await fetch(API+'/ocena',{method:'POST',body});tri.textContent=rr.ok?'Thank you — recorded (only the letter and the answer id).':'Could not record the rating.';}catch(_){tri.textContent='Could not record the rating.';}}));
- }catch(_){out.innerHTML='<p class="m">The service is not responding. Please try again shortly.</p>';}
+ }catch(err){if(my!==seq)return;out.innerHTML='<p class="m">'+(err&&(err.name==='TimeoutError'||err.name==='AbortError')?'The answer is taking too long. Please try again shortly.':'The service is not responding. Please try again shortly.')+'</p>';}
 });
 })();
 </script>
